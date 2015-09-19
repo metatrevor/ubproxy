@@ -24,29 +24,20 @@
 #   Forked from  https://code.google.com/p/ubproxy/
 #
 # Changelog:
-#>  GTK support enabled
-#>  Removed profile saving option
+# >  GTK support enabled
+# >  Removed profile saving option
 #
 
 
-
-
-
-
-
-
 import gtk
-import pygtk
 import os
 import re
 import sys
 from datetime import datetime
 
-
-
-filenames=["/etc/bash.bashrc","/etc/environment"]
-filename2="/etc/apt/apt.conf"
-logs="/var/log/proxychangerlog"
+filenames = ["/etc/bash.bashrc", "/etc/environment"]
+filename2 = "/etc/apt/apt.conf"
+logs = "/var/log/proxychangerlog"
 
 
 class Sub:
@@ -57,21 +48,21 @@ class Sub:
         self.hbox0 = gtk.HBox()
         self.hbox1 = gtk.HBox()
         self.hbox2 = gtk.HBox()
-        self.label1=gtk.Label("Username")
-        self.label2=gtk.Label("Password")
+        self.label1 = gtk.Label("Username")
+        self.label2 = gtk.Label("Password")
         self.entry1 = gtk.Entry()
         self.entry2 = gtk.Entry()
         self.entry2.set_visibility(False)
         self.but1 = gtk.Button("Ok")
         self.but2 = gtk.Button("Cancel")
-        
+
         self.hbox0.pack_start(self.label1)
         self.hbox0.pack_start(self.entry1)
         self.hbox1.pack_start(self.label2)
         self.hbox1.pack_start(self.entry2)
         self.hbox2.pack_start(self.but1)
         self.hbox2.pack_start(self.but2)
-        
+
         self.vbox.pack_start(self.hbox0)
         self.vbox.pack_start(self.hbox1)
         self.vbox.pack_start(self.hbox2)
@@ -88,29 +79,32 @@ class Sub:
         self.window.add(self.vbox)
         self.window.show()
         self.but2.connect("clicked", self.cancel, base.checkbox)
-        self.but2.connect_object("clicked",gtk.Widget.destroy, self.window)
-        self.but1.connect("clicked",self.ok, base)
+        self.but2.connect_object("clicked", gtk.Widget.destroy, self.window)
+        self.but1.connect("clicked", self.ok, base)
         self.but1.connect_object("clicked", gtk.Widget.destroy, self.window)
+
     def ok(self, event, data=None):
         data.uname = self.entry1.get_text()
         data.passw = self.entry2.get_text()
-    def cancel(self,event, data=None):
+
+    def cancel(self, event, data=None):
         data.set_active(False)
 
-    def delete_event(self, widget,event,data= None):
+    def delete_event(self, widget, event, data=None):
         return True
+
+
 class Base:
     def __init__(self):
-        
+
         self.checkbox = gtk.CheckButton("Authentication?")
         self.box0 = gtk.VBox()
         self.box1 = gtk.HBox()
         self.box2 = gtk.VBox()
-        
-        
+
         self.box3 = gtk.HBox()
         self.box4 = gtk.HBox()
-        
+
         self.entry = gtk.Entry()
         self.box0.pack_start(self.box2)
         self.box0.pack_start(self.checkbox)
@@ -121,32 +115,25 @@ class Base:
         self.button2 = gtk.Button("Remove")
         self.box1.pack_start(self.button1)
         self.box1.pack_start(self.button2)
-        
-        self.label1 =gtk.Label("Host")
+
+        self.label1 = gtk.Label("Host")
         self.label2 = gtk.Label("Port")
-        
-       
-       
+
         self.button1.show()
         self.button2.show()
-        self.entry2= gtk.Entry()
+        self.entry2 = gtk.Entry()
         self.box2.pack_start(self.box4)
-        
-        
+
         self.entry.connect("activate", self.act, self.entry)
         self.entry2.connect("activate", self.act, self.entry2)
-        
-        self.checkbox.connect("toggled", self.tog, None)
-       
 
-        
-        
-        
+        self.checkbox.connect("toggled", self.tog, None)
+
         self.box3.pack_start(self.label1)
         self.box3.pack_start(self.entry)
         self.box4.pack_start(self.label2)
         self.box4.pack_start(self.entry2)
-        
+
         self.entry2.show()
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.add(self.box0)
@@ -159,205 +146,207 @@ class Base:
         self.box4.show()
         self.checkbox.show()
         #
-           #before show--
+        # before show--
         #
         self.window.show()
         self.window.set_title("Ubproxy")
         self.opentext()
-        self.button1.connect("clicked",self.set,None )
-        self.button2.connect("clicked",self.remove,None)
+        self.button1.connect("clicked", self.set, None)
+        self.button2.connect("clicked", self.remove, None)
         self.button1.connect_object("clicked", gtk.Widget.destroy, self.window)
         self.button2.connect_object("clicked", gtk.Widget.destroy, self.window)
         self.window.connect("destroy", self.destroy)
 
-    def destroy(self,widget,data=None):
-        if(self.flog!=None):
+    def destroy(self, widget, data=None):
+        if (self.flog != None):
             self.flog.close()
         gtk.main_quit()
         sys.exit(0)
-                
+
     def act(self, widget, data=None):
         print data.get_text()
+
     def fin(self):
         self.host = self.entry.get_text()
         self.port = self.entry2.get_text()
         self.auth = self.checkbox.get_active()
 
     def tog(self, widget, data=None):
-        if(widget.get_active()):
+        if (widget.get_active()):
             sub = Sub(self)
+
     def set(self, widget, data=None):
-        backup([filenames[0],filenames[1],filename2])
+        backup([filenames[0], filenames[1], filename2])
         self.flog.write("Files have been backed up in '~/.Ubuntu-Proxy/'  with .backup extension \n")
-        clean(filename2,filenames)
+        clean(filename2, filenames)
         self.fin()
-        if(self.auth):
+        if (self.auth):
             filewrite4(self.host, self.port, self.uname, self.passw)
             self.flog.write("4 var proxy changed \n")
         else:
             filewrite2(self.host, self.port)
             self.flog.write("2 var proxy changed \n")
-        self.mbx = gtk.MessageDialog(self.window,gtk.DIALOG_DESTROY_WITH_PARENT,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"SUCCESSFULLY SET")
+        self.mbx = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE,
+                                     "SUCCESSFULLY SET")
         self.mbx.run()
         self.mbx.destroy()
-    def delete_event(self, widget,event,data= None):
-        return False    
+
+    def delete_event(self, widget, event, data=None):
+        return False
 
     def remove(self, widget, data=None):
-        backup([filenames[0],filenames[1],filename2])
+        backup([filenames[0], filenames[1], filename2])
         self.flog.write("Files have been backed up in '~/.Ubuntu-Proxy/' with .backup extension \n")
-        clean(filename2,filenames)
+        clean(filename2, filenames)
         self.flog.write("Old Proxy-Settings removed \n")
-        self.mbx = gtk.MessageDialog(self.window,gtk.DIALOG_DESTROY_WITH_PARENT,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,"SUCCESSFULLY REMOVED")
+        self.mbx = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE,
+                                     "SUCCESSFULLY REMOVED")
         self.mbx.run()
         self.mbx.destroy()
+
     def opentext(self):
         try:
-            self.flog=open(logs,"a")
-            self.flog.write(str(datetime.now())+"\n")
+            self.flog = open(logs, "a")
+            self.flog.write(str(datetime.now()) + "\n")
         except:
             self.flog = None
-            md = gtk.MessageDialog(self.window,gtk.DIALOG_DESTROY_WITH_PARENT,gtk.MESSAGE_ERROR,gtk.BUTTONS_CLOSE, "You are not a Root user --Run This as 'sudo'")
+            md = gtk.MessageDialog(self.window, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE,
+                                   "You are not a Root user --Run This as 'sudo'")
             md.run()
             md.destroy()
             sys.exit(0)
 
 
-
-
-
-def filewrite2(srv,port):
-    lin=[]
-    typ0 = ("http","ftp","https")
+def filewrite2(srv, port):
+    lin = []
+    typ0 = ("http", "ftp", "https")
     for filenam in filenames:
-        fil = open(filenam,"a")
+        fil = open(filenam, "a")
         fil.write("\n")
         for x in typ0:
-			if (filenam.find("bash")!=-1) :
-				lin.append("export %s_proxy=\"%s://%s:%s\"\n" % (x,x,srv,port))
-			else:	
-				lin.append("%s_proxy=\"%s://%s:%s\"\n" % (x,x,srv,port))
+            if (filenam.find("bash") != -1):
+                lin.append("export %s_proxy=\"%s://%s:%s\"\n" % (x, x, srv, port))
+            else:
+                lin.append("%s_proxy=\"%s://%s:%s\"\n" % (x, x, srv, port))
         for l in lin:
             fil.write(l)
         fil.close()
-        lin=[]
+        lin = []
 
-
-    lin2=[]
-    fil = open(filename2,"w")
+    lin2 = []
+    fil = open(filename2, "w")
     for x1 in typ0:
-        lin2.append('Acquire::%s::proxy "%s://%s:%s/";\n' %(x1,x1,srv,port))    
+        lin2.append('Acquire::%s::proxy "%s://%s:%s/";\n' % (x1, x1, srv, port))
     for l1 in lin2:
         fil.write(l1)
     fil.close()
 
-def filewrite4(srv,port,name,pasw):
-    lin=[]
-    typ0 = ("http","ftp","https")
+
+def filewrite4(srv, port, name, pasw):
+    lin = []
+    typ0 = ("http", "ftp", "https")
     for filenam in filenames:
-        fil = open(filenam,"a")
+        fil = open(filenam, "a")
         for x in typ0:
-			if (filenam.find("bash")!=-1):
-				lin.append("export %s_proxy=\"%s://%s:%s@%s:%s\"\n" % (x,x,name,pasw,srv,port))
-			else:	
-				lin.append("%s_proxy=\"%s://%s:%s@%s:%s\"\n" % (x,x,name,pasw,srv,port))
+            if (filenam.find("bash") != -1):
+                lin.append("export %s_proxy=\"%s://%s:%s@%s:%s\"\n" % (x, x, name, pasw, srv, port))
+            else:
+                lin.append("%s_proxy=\"%s://%s:%s@%s:%s\"\n" % (x, x, name, pasw, srv, port))
         for l in lin:
             fil.write(l)
         fil.close()
-        lin=[]
+        lin = []
 
-
-    lin2=[]
-    fil = open(filename2,"w")
+    lin2 = []
+    fil = open(filename2, "w")
     for x1 in typ0:
-        lin2.append('Acquire::%s::proxy "%s://%s:%s@%s:%s/";\n' %(x1,x1,name,pasw,srv,port))    
+        lin2.append('Acquire::%s::proxy "%s://%s:%s@%s:%s/";\n' % (x1, x1, name, pasw, srv, port))
     for l1 in lin2:
         fil.write(l1)
     fil.close()
+
 
 def backup(files):
-	homefol=os.getenv('HOME')
-	folder=homefol+"/.Ubuntu-Proxy/"	
-	try:
-			
-		os.mkdir(folder)
-	except:
-		pass
-		
-	filstr=datetime.now().strftime('%Y%h%d_%H%M%S')
-	newfolder=folder+filstr+"/"
-	try:
-		os.mkdir(newfolder)
-	except:
-		pass
-	
-	for fil in files:
-		try:
-			f1=open(fil,"r")
-			l=f1.read()
-			f1.close()
-			
-			if(fil.find(".")==-1):
-				newname=fil[fil.rfind('/')+1:]+".backup"
-			
-			
-			else: 
-				fil=fil[fil.rfind('/')+1:]
-				newname=fil[:fil.find(".")]+".backup"
-			newname=newfolder+newname
-			f2=open(newname,"w")
-			f2.write(l)
-			f2.close()
-		except :
-			pass
+    homefol = os.getenv('HOME')
+    folder = homefol + "/.Ubuntu-Proxy/"
+    try:
 
-def clean(file2,files,para=False):
-	if(para):
-		for file1 in files:
-			try:
-				f=open(file1,'r')	
-				l = f.read()
-				l = re.sub(r'\n?(.*http_proxy\s*=\s*".*")',r'\n# \g<1>',l)
-				l = re.sub(r'\n?(.*https_proxy\s*=\s*".*")',r'\n# \g<1>',l)
-				l = re.sub(r'\n?(.*ftp_proxy\s*=\s*".*")',r'\n# \g<1>',l)
-				f.close()
-				f=open(file1,'w')
-				f.write(l)
-				f.close()
-			except:
+        os.mkdir(folder)
+    except:
+        pass
 
-				pass
-	else:
-		for file1 in files:
-			try:
-				f=open(file1,'r')
-				l = f.read()
-				l = re.sub(r'\n?(.*http_proxy\s*=\s*".*")',r'',l)
-				l = re.sub(r'\n?(.*https_proxy\s*=\s*".*")',r'',l)
-				l = re.sub(r'\n?(.*ftp_proxy\s*=\s*".*")',r'',l)
-				f.close()
-				f=open(file1,'w')
-				f.write(l)
-				f.close()
-			except:
+    filstr = datetime.now().strftime('%Y%h%d_%H%M%S')
+    newfolder = folder + filstr + "/"
+    try:
+        os.mkdir(newfolder)
+    except:
+        pass
 
-				pass
-		try:		
-			f=open(file2,"r")
-			l = f.read()
-			l = re.sub(r'\n?(.*Acquire.*".*?";)' ,"",l)		
-			f.close()
-			f=open(file2,'w')
-			f.write(l)
-			f.close()
-		except:
+    for fil in files:
+        try:
+            f1 = open(fil, "r")
+            l = f1.read()
+            f1.close()
 
-			pass
+            if (fil.find(".") == -1):
+                newname = fil[fil.rfind('/') + 1:] + ".backup"
 
 
+            else:
+                fil = fil[fil.rfind('/') + 1:]
+                newname = fil[:fil.find(".")] + ".backup"
+            newname = newfolder + newname
+            f2 = open(newname, "w")
+            f2.write(l)
+            f2.close()
+        except:
+            pass
 
-    
-    
-if(__name__=="__main__"):
-    base= Base()
+
+def clean(file2, files, para=False):
+    if (para):
+        for file1 in files:
+            try:
+                f = open(file1, 'r')
+                l = f.read()
+                l = re.sub(r'\n?(.*http_proxy\s*=\s*".*")', r'\n# \g<1>', l)
+                l = re.sub(r'\n?(.*https_proxy\s*=\s*".*")', r'\n# \g<1>', l)
+                l = re.sub(r'\n?(.*ftp_proxy\s*=\s*".*")', r'\n# \g<1>', l)
+                f.close()
+                f = open(file1, 'w')
+                f.write(l)
+                f.close()
+            except:
+
+                pass
+    else:
+        for file1 in files:
+            try:
+                f = open(file1, 'r')
+                l = f.read()
+                l = re.sub(r'\n?(.*http_proxy\s*=\s*".*")', r'', l)
+                l = re.sub(r'\n?(.*https_proxy\s*=\s*".*")', r'', l)
+                l = re.sub(r'\n?(.*ftp_proxy\s*=\s*".*")', r'', l)
+                f.close()
+                f = open(file1, 'w')
+                f.write(l)
+                f.close()
+            except:
+
+                pass
+        try:
+            f = open(file2, "r")
+            l = f.read()
+            l = re.sub(r'\n?(.*Acquire.*".*?";)', "", l)
+            f.close()
+            f = open(file2, 'w')
+            f.write(l)
+            f.close()
+        except:
+
+            pass
+
+
+if (__name__ == "__main__"):
+    base = Base()
     gtk.main()
