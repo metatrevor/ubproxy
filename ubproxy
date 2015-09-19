@@ -252,6 +252,7 @@ def filewrite2(srv,port):
     typ0 = ("http","ftp","https")
     for filenam in filenames:
         fil = open(filenam,"a")
+        fil.write("\n")
         for x in typ0:
 			if (filenam.find("bash")!=-1) :
 				lin.append("export %s_proxy=\"%s://%s:%s\"\n" % (x,x,srv,port))
