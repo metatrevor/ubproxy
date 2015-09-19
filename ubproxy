@@ -3,46 +3,25 @@
 #   "Ubproxy"
 #   with GTK Interface 
 #
-#   Ubuntu proxy setting tool.
+#   Ubuntu and derivatives proxy setting tool.
 #   This sets the apt,bash and profile config-files.
-#   Network proxy-settings with user-name and password can only be configured with this tool .
-#   
-#   Supports Ubuntu 8.04 - Ubuntu 11.10 (Latest as of Jan 2012)
+#
 #   An inevitable tool to configure proxy-settings in universities and office environmment.
 #   Eliminates the need of repetitive editing of system files that is prone to frequent manual errors.  
-#   Atleast 3 dfferent individual config files needs to be edited to configure proxy settings,
-#   especially the network proxy-settings with user-name and password.
-#   This can be used in an environment where all the Three - ("http","https" and the "ftp") proxies have the same settings.
-#   
+#   Atleast 3 different individual config files needs to be edited to configure proxy settings,
+#   This can be used in an environment where all the Three - ("http","https" and the "ftp") proxies
+#   have the same settings.
 #
 #
-#  Visit The project url at  http://goo.gl/qjR9s
+#   Author:
 #
-#   Author:  Sadhanandh Iyer
+#   E-mail:
 #
-#   E-mail:  sadhanandhiyer[@]gmail[.]com
+#   Date:
 #
-#   Date:    1/2/2011
+#   Profile:
 #
-#   Profile: http://goo.gl/IVg3g
-#
-#   Meta:   
-#            Sadhanandh Iyer
-#            Linux Community 
-#            ABV - Indian Institute of Information Technology and Management - Gwalior
-#            
-#
-#
-#
-#   """With power comes responsibility, so 'sudo' with care"""
-#
-#   Powered By:
-#               Ubuntu 11.10 & Vim 7.3.35
-#   
-#
-#   Ver. - 2.2.13
-#
-#
+#   Forked from  https://code.google.com/p/ubproxy/
 #
 # Changelog:
 #>  GTK support enabled
