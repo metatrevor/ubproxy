@@ -347,6 +347,9 @@ def clean(file2, files, para=False):
             pass
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
+    if not os.geteuid() == 0:
+        args = ['gksudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('gksudo', *args)
     base = Base()
     gtk.main()
